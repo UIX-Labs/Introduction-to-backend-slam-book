@@ -38,6 +38,10 @@ async function startServer() {
         let statusCode = 404;
 
         try {
+          if (path === '') {
+            responseContent = JSON.stringify(`Yay, app is running on port ${PORT}`);
+            statusCode = 200;
+          }
           if (path === 'slambook') {
             switch (method) {
               case 'get':
