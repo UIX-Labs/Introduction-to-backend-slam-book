@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 
 
+//TASK 4:Create Document for slam book
+
 const slambookSchema = new mongoose.Schema({
     nameInYourContact: String,
     relationship: String,
