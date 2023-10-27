@@ -8,6 +8,7 @@ const HOSTNAME = 'localhost';
 
 const SlamBook = require('./model.js');
 
+//  Change with your MONGO URI :
 const uri = "mongodb+srv://suraj_admin:suraj_admin@cluster0.dme40pl.mongodb.net/?retryWrites=true&w=majority";
 
 async function startServer() {
