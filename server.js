@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const url = require('url');
 const { StringDecoder } = require('string_decoder');
 
-const PORT = 3000;
-const HOSTNAME = 'localhost';
+const PORT = 8000;
+const HOSTNAME = '0.0.0.0';
 
 const SlamBook = require('./model.js');
 
