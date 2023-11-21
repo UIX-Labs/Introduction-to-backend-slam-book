@@ -32,8 +32,9 @@ form.addEventListener("submit", async (e) => {
   };
 
   // write your post request below
-  const req= await fetch("http://0.0.0.0:8000/", {
+  const req = await fetch("http://localhost:8000/slambook", {
     method: "POST", // *GET, POST, PUT, DELETE, etc.
+    mode: "no-cors",
     body: JSON.stringify(newSlam), // body data type must match "Content-Type" header
   });
   const data = response.json(); // parses JSON response into native JavaScript objects
@@ -45,47 +46,59 @@ form.addEventListener("submit", async (e) => {
 
 async function showSlamList() {
   //Write your get request below and save the slam in allSlams
-  const req= await fetch("http://0.0.0.0:8000/", {
+  const response = await fetch("http://localhost:8000/slambook", {
     method: "GET", // *GET, POST, PUT, DELETE, etc.
   });
+
+  const data = await response.json();
   //Write your get request above
 
-  const ans = allSlamArray.map((slam) => {
+  const ans = data.map((slam) => {
     return `<div class="card">
 
-<p>My name in your contact is <span class="answer">${slam.contactName}</span></p>
+<p>My name in your contact is <span class="answer">${slam.nameInYourContact}</span></p>
 
 <p>Relationship between us is <span class="answer">${slam.relationship}</span></p>
 
-<p>Something you like in me is <span class="answer">${slam.likeInMe}</span></p>
+<p>Something you like in me is <span class="answer">${slam.somethingYouLikeInMe}</span></p>
 
-<p>Something you hate in me is <span class="answer">${slam.hateInMe}</span></p>
+<p>Something you hate in me is <span class="answer">${slam.somethingYouHateInMe}</span></p>
 
 <p>If I die what would be your reaction?</p>
 
-<p><span class="answer">${slam.deadReaction}</span></p>
+<p><span class="answer">${slam.ifIDieYourReaction}</span></p>
 
 <p>What did you feel when you first saw me?</p>
 
-<p><span class="answer">${slam.firstImpression}</span></p>
+<p><span class="answer">${slam.whatDidYouFeelWhenYouFirstSawMe}</span></p>
 
 <p>A beautiful message for me?</p>
 
-<p><span class="answer">${slam.beautifulMessage}</span></p>
+<p><span class="answer">${slam.beutifulMessageForMe}</span></p>
 
-<p>A nickname for me is <span class="answer">${slam.nickname}</span></p>
+<p>A nickname for me is <span class="answer">${slam.nickNameForMe}</span></p>
 
-<p>A song you want to dedicate to me is <span class="answer">${slam.songForMe}</span></p>
+<p>A song you want to dedicate to me is <span class="answer">${slam.songDedicatedToMe}</span></p>
 
 <p>Can I share your opinion in my status?</p>
 
-<p><span class="answer">${slam.shareOpinion}</span></p>
-<button onClick= >Delete</button>
+<p><span class="answer">${slam.canIShare}</span></p>
+<button onClick="onDelete('${slam._id}')" >Delete</button>
+</div>
 `;
   });
 
-  const allSlams = document.getElementsByClassName("allSlams")[0];
-  allSlams.innerHTML=ans;
+  const allSlams = document.getElementsByClassName("allSlams");
+  allSlams[0].innerHTML = ans;
 }
+
+const onDelete = async (index) => {
+  //Write your delete query below
+  const response = await fetch(`http://localhost:8000/slambook/${index}`, {
+    method: "DELETE", // *GET, POST, PUT, DELETE, etc.
+  });
+  //Write your delete query above
+  showSlamList();
+};
 
 showSlamList();
