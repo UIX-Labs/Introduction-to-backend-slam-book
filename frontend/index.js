@@ -32,7 +32,7 @@ form.addEventListener("submit", async (e) => {
   };
 
   // write your post request below
-  const req= await fetch(url, {
+  const req= await fetch("http://0.0.0.0:8000/", {
     method: "POST", // *GET, POST, PUT, DELETE, etc.
     body: JSON.stringify(newSlam), // body data type must match "Content-Type" header
   });
@@ -45,7 +45,7 @@ form.addEventListener("submit", async (e) => {
 
 async function showSlamList() {
   //Write your get request below and save the slam in allSlams
-  const req= await fetch(url, {
+  const req= await fetch("http://0.0.0.0:8000/", {
     method: "GET", // *GET, POST, PUT, DELETE, etc.
   });
   //Write your get request above
