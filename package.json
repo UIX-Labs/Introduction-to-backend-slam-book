@@ -1,6 +1,22 @@
 {
+  "name": "introduction-to-backend-slam-book",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:UIX-Labs/Introduction-to-backend-slam-book.git",
+  "license": "MIT",
+  "private": "true",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "start": "concurrently \"yarn workspace backend start\" \"yarn workspace frontend start\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
   "dependencies": {
-    "mongodb": "^6.2.0",
-    "mongoose": "^7.6.3"
+    "frontail": "^4.9.2",
+    "global": "^4.4.0"
   }
 }
