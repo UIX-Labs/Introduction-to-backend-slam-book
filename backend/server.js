@@ -1,20 +1,20 @@
 // TASK 1: Setting up server
 
 
-const http = require('http');
+// const http = require('http');
 
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  res.end('Hello World\n');
-});
+// const server = http.createServer((req, res) => {
+//   res.statusCode = 200;
+//   res.setHeader('Content-Type', 'text/plain');
+//   res.end('Hello World\n');
+// });
 
-const PORT = 8000;
-const HOSTNAME = '0.0.0.0';
+// const PORT = 8000;
+// const HOSTNAME = '0.0.0.0';
 
-server.listen(PORT, HOSTNAME, () => {
-  console.log(`Server running at http://${HOSTNAME}:${PORT}/`);
-});
+// server.listen(PORT, HOSTNAME, () => {
+//   console.log(`Server running at http://${HOSTNAME}:${PORT}/`);
+// });
 
 
 
@@ -101,10 +101,32 @@ startServer();
 
 
 
+//TASK 4:Create Document for slam book
+/*
+const slambookSchema = new mongoose.Schema({
+  nameInYourContact: String,
+  relationship: String,
+  somethingYouLikeInMe: String,
+  somethingYouHateInMe: String,
+  ifIDieYourReaction: String,
+  whatDidYouFeelWhenYouFirstSawMe: String,
+  beutifulMessageForMe: String,
+  nickNameForMe: String,
+  songDedicatedToMe: String,
+  canIShare: String,
+  yourName: String
+});
+
+const SlamBook = mongoose.model('SlamBook', slambookSchema);
+*/
+
+
+
 //TASK5: Write sample crud endpoints
 /**
 const http = require('http');
 const url = require('url');
+const mongoose = require('mongoose');
 const { StringDecoder } = require('string_decoder');
 
 const PORT = 8000;
@@ -162,17 +184,31 @@ server.listen(PORT, HOSTNAME, () => {
 
 
 //TASK 06-09 CRUD For Slambook: 
-/* 
+/**
 const http = require('http');
 const mongoose = require('mongoose');
 const url = require('url');
+const cors = require('cors');
 const { StringDecoder } = require('string_decoder');
 
 const PORT = 8000;
 const HOSTNAME = '0.0.0.0';
 
-const SlamBook = require('./model.js');
+const slambookSchema = new mongoose.Schema({
+  nameInYourContact: String,
+  relationship: String,
+  somethingYouLikeInMe: String,
+  somethingYouHateInMe: String,
+  ifIDieYourReaction: String,
+  whatDidYouFeelWhenYouFirstSawMe: String,
+  beutifulMessageForMe: String,
+  nickNameForMe: String,
+  songDedicatedToMe: String,
+  canIShare: String,
+  yourName: String
+});
 
+const SlamBook = mongoose.model('SlamBook', slambookSchema);
 //  Change with your MONGO URI :
 const uri = "mongodb+srv://suraj_admin:suraj_admin@cluster0.dme40pl.mongodb.net/?retryWrites=true&w=majority";
 
@@ -188,6 +224,9 @@ async function startServer() {
       const path = parsedUrl.pathname.replace(/^\/+|\/+$/g, '');
       const method = req.method.toLowerCase();
       const queryStringObject = parsedUrl.query;
+
+      res.setHeader('Access-Control-Allow-Origin', '*');
+
 
       // Buffer the data
       const decoder = new StringDecoder('utf-8');
@@ -270,5 +309,4 @@ async function startServer() {
 }
 
 startServer();
-
-**/
+ */
