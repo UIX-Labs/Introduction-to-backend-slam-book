@@ -184,15 +184,33 @@ server.listen(PORT, HOSTNAME, () => {
 
 
 //TASK 06-09 CRUD For Slambook: 
-const http = require('http');
+const express = require('express');
 const mongoose = require('mongoose');
-const url = require('url');
-// const cors = require('cors');
-const { StringDecoder } = require('string_decoder');
+const bodyParser = require('body-parser');
+const cors = require('cors');
 
 const PORT = 8000;
 const HOSTNAME = '0.0.0.0';
 
+const app = express();
+
+// Middleware
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(cors());
+
+// MongoDB connection
+const uri = "mongodb+srv://suraj_admin:suraj_admin@cluster0.dme40pl.mongodb.net/?retryWrites=true&w=majority";
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch((err) => {
+    console.error('Could not connect to MongoDB:', err);
+    process.exit(1);
+  });
+
+// SlamBook schema and model
 const slambookSchema = new mongoose.Schema({
   nameInYourContact: String,
   relationship: String,
@@ -208,103 +226,74 @@ const slambookSchema = new mongoose.Schema({
 });
 
 const SlamBook = mongoose.model('SlamBook', slambookSchema);
-//  Change with your MONGO URI :
-const uri = "mongodb+srv://suraj_admin:suraj_admin@cluster0.dme40pl.mongodb.net/?retryWrites=true&w=majority";
+// Routes
+app.get('/', (req, res) => {
+  res.json({ message: `Yay, app is running on port ${PORT}` });
+});
 
-async function startServer() {
+app.get('/slambook', async (req, res) => {
   try {
-    // Connect to MongoDB using Mongoose
-    await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    console.log('Connected to MongoDB');
-
-    // Create HTTP Server
-    const server = http.createServer(async (req, res) => {
-      const parsedUrl = url.parse(req.url, true);
-      const path = parsedUrl.pathname.replace(/^\/+|\/+$/g, '');
-      const method = req.method.toLowerCase();
-      const queryStringObject = parsedUrl.query;
-
-      res.setHeader('Access-Control-Allow-Origin', '*');
-
-
-      // Buffer the data
-      const decoder = new StringDecoder('utf-8');
-      let buffer = '';
-      req.on('data', (data) => {
-        buffer += decoder.write(data);
-      });
-
-      req.on('end', async () => {
-        buffer += decoder.end();
-
-        let responseContent = 'Not Found\n';
-        let statusCode = 404;
-
-        try {
-          if (path === '') {
-            responseContent = JSON.stringify(`Yay, app is running on port ${PORT}`);
-            statusCode = 200;
-          }
-          if (path === 'slambook') {
-            switch (method) {
-              case 'get':
-                const entries = await SlamBook.find(queryStringObject);
-                responseContent = JSON.stringify(entries);
-                statusCode = 200;
-                break;
-              case 'post':
-                const newEntry = new SlamBook(JSON.parse(buffer));
-                await newEntry.save();
-                responseContent = 'Entry Created\n';
-                statusCode = 201;
-                break;
-            }
-          } else if (path.startsWith('slambook/')) {
-            const id = path.split('/')[1];
-            switch (method) {
-              case 'get':
-                const entry = await SlamBook.findById(id);
-                if (entry) {
-                  responseContent = JSON.stringify(entry);
-                  statusCode = 200;
-                }
-                break;
-              case 'put':
-                const updatedEntry = await SlamBook.findByIdAndUpdate(id, JSON.parse(buffer), { new: true });
-                if (updatedEntry) {
-                  responseContent = 'Entry Updated\n';
-                  statusCode = 200;
-                }
-                break;
-              case 'delete':
-                const deletedEntry = await SlamBook.findByIdAndDelete(id);
-                if (deletedEntry) {
-                  responseContent = 'Entry Deleted\n';
-                  statusCode = 200;
-                }
-                break;
-            }
-          }
-
-          res.writeHead(statusCode, { 'Content-Type': 'application/json' });
-          res.end(responseContent);
-
-        } catch (error) {
-          console.error('Error processing request:', error);
-          res.writeHead(500, { 'Content-Type': 'application/json' });
-          res.end('Internal Server Error\n');
-        }
-      });
-    });
-
-    // Start HTTP Server
-    server.listen(PORT, HOSTNAME, () => {
-      console.log(`Server running at http://${HOSTNAME}:${PORT}/`);
-    });
-  } catch (err) {
-    console.error('Could not connect to MongoDB:', err);
-    process.exit(1);
+    const entries = await SlamBook.find(req.query);
+    res.json(entries);
+  } catch (error) {
+    console.error('Error fetching slambook entries:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
-}
+});
 
-startServer();
+app.post('/slambook', async (req, res) => {
+  try {
+    const newEntry = new SlamBook(req.body);
+    await newEntry.save();
+    res.status(201).json({ message: 'Entry Created' });
+  } catch (error) {
+    console.error('Error creating slambook entry:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/slambook/:id', async (req, res) => {
+  try {
+    const entry = await SlamBook.findById(req.params.id);
+    if (entry) {
+      res.json(entry);
+    } else {
+      res.status(404).json({ message: 'Entry not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching slambook entry:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.put('/slambook/:id', async (req, res) => {
+  try {
+    const updatedEntry = await SlamBook.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (updatedEntry) {
+      res.json({ message: 'Entry Updated' });
+    } else {
+      res.status(404).json({ message: 'Entry not found' });
+    }
+  } catch (error) {
+    console.error('Error updating slambook entry:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.delete('/slambook/:id', async (req, res) => {
+  try {
+    const deletedEntry = await SlamBook.findByIdAndDelete(req.params.id);
+    if (deletedEntry) {
+      res.json({ message: 'Entry Deleted' });
+    } else {
+      res.status(404).json({ message: 'Entry not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting slambook entry:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+// Start the server
+app.listen(PORT, HOSTNAME, () => {
+  console.log(`Server running at http://${HOSTNAME}:${PORT}/`);
+});
